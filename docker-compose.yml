@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      target: backend
+    environment:
+      - FLASK_APP=src/api/crystal_calculator_api.py
+      - FLASK_ENV=production
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    networks:
+      - qdt-network
+
+  frontend:
+    build:
+      context: .
+      target: frontend-build
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - qdt-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - qdt-network
+
+networks:
+  qdt-network:
+    driver: bridge
+
+volumes:
+  redis-data: 

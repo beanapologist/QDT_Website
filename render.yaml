@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: quantum-duality-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: quantum-duality-backend
+    env: python
+    buildCommand: pip install -r requirements.txt && python setup.py install
+    startCommand: gunicorn --chdir src/api crystal_calculator_api:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+
+databases:
+  - name: quantum-duality-redis
+    type: redis 
