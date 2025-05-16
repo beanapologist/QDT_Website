@@ -7,4 +7,4 @@ pytest==7.4.3
 python-dotenv==1.0.0
 redis==4.1.0  # Optional: for distributed rate limiting
 gunicorn==20.1.0
-scipy==1.9.3 
+scipy==1.10.1 

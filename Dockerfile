@@ -1,5 +1,5 @@
 # Use multi-stage build for optimized image size
-FROM python:3.10-slim AS backend
+FROM python:3.10-bullseye AS backend
 
 # Set working directory
 WORKDIR /app
@@ -10,10 +10,20 @@ RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     gfortran \
+    python3-dev \
+    libopenblas-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Copy requirements first for better caching
 COPY requirements.txt .
+
+# Install numpy first separately
+RUN pip install --no-cache-dir numpy==1.24.3
+
+# Then install the rest of the requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend code
