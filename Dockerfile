@@ -1,5 +1,5 @@
 # Use multi-stage build for optimized image size
-FROM python:3.10-bullseye AS backend
+FROM python:3.10.12-slim-bullseye AS backend
 
 # Set working directory
 WORKDIR /app
@@ -14,17 +14,22 @@ RUN apt-get update && apt-get install -y \
     libopenblas-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip
+# Upgrade pip and install wheel
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Install scientific packages separately with specific platform tags
+RUN pip install --no-cache-dir \
+    numpy==1.24.3 \
+    scipy==1.10.1 \
+    --only-binary=:all:
 
 # Copy requirements first for better caching
 COPY requirements.txt .
 
-# Install numpy first separately
-RUN pip install --no-cache-dir numpy==1.24.3
-
-# Then install the rest of the requirements
-RUN pip install --no-cache-dir -r requirements.txt
+# Install remaining requirements
+RUN grep -v "numpy\|scipy" requirements.txt > other_requirements.txt && \
+    pip install --no-cache-dir -r other_requirements.txt && \
+    rm other_requirements.txt
 
 # Copy backend code
 COPY src/ src/
