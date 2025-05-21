@@ -54,4 +54,17 @@ kubectl wait --for=condition=available --timeout=300s deployment/redis
 echo "Getting external IP..."
 kubectl get service frontend-service
 
-echo "Deployment complete! Your application should be accessible at the external IP above." 
+echo "Deployment complete! Your application should be accessible at the external IP above."
+
+# Install Homebrew if you haven't already
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Google Cloud SDK
+brew install --cask google-cloud-sdk
+
+gcloud init
+
+gcloud auth login
+gcloud container clusters get-credentials qdt-cluster --region=us-central1 --project=hip-informatics-446103-u3 
+
+gcloud compute addresses list --project hip-informatics-446103-u3 

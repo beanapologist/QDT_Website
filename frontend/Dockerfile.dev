@@ -1,0 +1,27 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache \
+    curl \
+    wget \
+    python3 \
+    make \
+    g++
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Install additional dependencies
+RUN npm install @mui/material @emotion/react @emotion/styled chart.js react-chartjs-2
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Start development server with hot reload
+CMD ["npm", "start"] 

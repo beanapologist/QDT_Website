@@ -1,73 +1,128 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: quantum-duality-api
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
-      app: frontend
+      app: quantum-duality-api
   template:
     metadata:
       labels:
-        app: frontend
+        app: quantum-duality-api
     spec:
       containers:
-      - name: frontend
-        image: gcr.io/YOUR_PROJECT_ID/quantum-duality-frontend:latest
+      - name: api
+        image: gcr.io/${PROJECT_ID}/quantum-duality-api:latest
         ports:
-        - containerPort: 80
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: backend
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: backend
-  template:
-    metadata:
-      labels:
-        app: backend
-    spec:
-      containers:
-      - name: backend
-        image: gcr.io/YOUR_PROJECT_ID/quantum-duality-backend:latest
+        - containerPort: 5000
         env:
-        - name: FLASK_APP
-          value: "src/api/crystal_calculator_api.py"
         - name: FLASK_ENV
           value: "production"
         - name: REDIS_URL
-          value: "redis://redis-service:6379/0"
-        ports:
-        - containerPort: 5000
+          value: "redis://quantum-duality-redis:6379/0"
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: quantum-duality-secrets
+              key: openai-api-key
+        - name: GPT_MODEL
+          value: "gpt-3.5-turbo"
+        - name: MAX_TOKENS
+          value: "1000"
+        - name: TEMPERATURE
+          value: "0.7"
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis
+  name: quantum-duality-frontend
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: redis
+      app: quantum-duality-frontend
   template:
     metadata:
       labels:
-        app: redis
+        app: quantum-duality-frontend
     spec:
       containers:
-      - name: redis
-        image: redis:alpine
+      - name: frontend
+        image: gcr.io/${PROJECT_ID}/quantum-duality-frontend:latest
         ports:
-        - containerPort: 6379
-        volumeMounts:
-        - name: redis-data
-          mountPath: /data
-      volumes:
-      - name: redis-data
-        persistentVolumeClaim:
-          claimName: redis-pvc 
+        - containerPort: 80
+        env:
+        - name: REACT_APP_API_URL
+          value: "https://api.quantum-duality.com/api"
+        - name: REACT_APP_WS_URL
+          value: "wss://api.quantum-duality.com/ws"
+        resources:
+          requests:
+            cpu: "0.2"
+            memory: "256Mi"
+          limits:
+            cpu: "0.5"
+            memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quantum-duality-api
+spec:
+  selector:
+    app: quantum-duality-api
+  ports:
+  - port: 80
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quantum-duality-frontend
+spec:
+  selector:
+    app: quantum-duality-frontend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: quantum-duality-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "quantum-duality-ip"
+    networking.gke.io/managed-certificates: "quantum-duality-cert"
+spec:
+  rules:
+  - host: api.quantum-duality.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: quantum-duality-api
+            port:
+              number: 80
+  - host: quantum-duality.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: quantum-duality-frontend
+            port:
+              number: 80 

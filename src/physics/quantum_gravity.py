@@ -1,6 +1,6 @@
 import numpy as np # type: ignore
 from typing import Dict, List, Tuple
-from src.physics import QDTConstants, QDTCosmologyModel, QDTDarkEnergyModel, QDTQuantumGravity, ParticlePhysicsConnections
+from .constants import QDTConstants
 
 """Quantum Gravity QDT Module
 

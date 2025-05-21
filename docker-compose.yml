@@ -1,29 +1,62 @@
 version: '3.8'
 
 services:
-  backend:
+  api:
     build:
       context: .
-      target: backend
+      dockerfile: Dockerfile
     environment:
-      - FLASK_APP=src/api/crystal_calculator_api.py
-      - FLASK_ENV=production
+      - FLASK_APP=src.api.crystal_calculator_api
+      - FLASK_ENV=development
+      - PYTHONPATH=/app/src
       - REDIS_URL=redis://redis:6379/0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GPT_MODEL=gpt-3.5-turbo
+      - MAX_TOKENS=1000
+      - TEMPERATURE=0.7
+    ports:
+      - "5001:5000"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     networks:
       - qdt-network
+    volumes:
+      - .:/app
+      - /app/venv
+    command: flask run --host=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   frontend:
     build:
-      context: .
-      target: frontend-build
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      - REACT_APP_API_URL=http://localhost:5001/api
+      - REACT_APP_WS_URL=ws://localhost:5001/ws
+      - NODE_ENV=development
     ports:
-      - "80:80"
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
-      - backend
+      api:
+        condition: service_healthy
     networks:
       - qdt-network
+    command: npm start
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   redis:
     image: redis:alpine
@@ -33,6 +66,12 @@ services:
       - redis-data:/data
     networks:
       - qdt-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
   qdt-network:

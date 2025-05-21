@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QDT Security Dashboard - Accessibility Guide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2a2a2a;
+            --text-color: #ffffff;
+            --accent-color: #007bff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            background: var(--primary-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+        }
+
+        .accessibility-section {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .accessibility-section h2 {
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: "•";
+            color: var(--accent-color);
+            position: absolute;
+            left: 0;
+        }
+
+        .keyboard-shortcut {
+            background: var(--secondary-bg);
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin: 0 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+
+        .back-to-dashboard {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 50%;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .back-to-dashboard:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* High contrast mode */
+        .high-contrast {
+            --primary-bg: #000000;
+            --secondary-bg: #ffffff;
+            --text-color: #ffffff;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .accessibility-section {
+                break-inside: avoid;
+                border: 1px solid #ddd;
+            }
+            .back-to-dashboard {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <header class="mb-5">
+            <h1 class="display-4 mb-4">Accessibility Guide</h1>
+            <p class="lead">Learn how to use the QDT Security Dashboard with accessibility features and keyboard shortcuts.</p>
+        </header>
+
+        <main>
+            <section class="accessibility-section" id="keyboard-navigation">
+                <h2><i class="fas fa-keyboard me-2"></i>Keyboard Navigation</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Basic Navigation</h3>
+                        <ul class="feature-list">
+                            <li>Use <kbd>Tab</kbd> to navigate between interactive elements</li>
+                            <li>Use <kbd>Shift + Tab</kbd> to navigate backwards</li>
+                            <li>Use <kbd>Enter</kbd> or <kbd>Space</kbd> to activate buttons and links</li>
+                            <li>Use <kbd>Esc</kbd> to close modals and panels</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Keyboard Shortcuts</h3>
+                        <ul class="feature-list">
+                            <li><kbd>Ctrl/Cmd + R</kbd> - Refresh dashboard</li>
+                            <li><kbd>Ctrl/Cmd + H</kbd> - Toggle high contrast mode</li>
+                            <li><kbd>Ctrl/Cmd + M</kbd> - Toggle reduced motion</li>
+                            <li><kbd>Ctrl/Cmd + +</kbd> - Increase font size</li>
+                            <li><kbd>Ctrl/Cmd + -</kbd> - Decrease font size</li>
+                            <li><kbd>Ctrl/Cmd + 0</kbd> - Reset font size</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="accessibility-section" id="screen-reader">
+                <h2><i class="fas fa-universal-access me-2"></i>Screen Reader Support</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Navigation</h3>
+                        <ul class="feature-list">
+                            <li>Use the "Skip to main content" link at the top of the page</li>
+                            <li>All interactive elements have descriptive labels</li>
+                            <li>Status changes and updates are announced</li>
+                            <li>Charts and graphs have text alternatives</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Announcements</h3>
+                        <ul class="feature-list">
+                            <li>Live updates are announced</li>
+                            <li>Error messages are announced</li>
+                            <li>Status changes are announced</li>
+                            <li>Navigation changes are announced</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="accessibility-section" id="visual-accessibility">
+                <h2><i class="fas fa-eye me-2"></i>Visual Accessibility</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>High Contrast Mode</h3>
+                        <ul class="feature-list">
+                            <li>Toggle with <kbd>Ctrl/Cmd + H</kbd></li>
+                            <li>Enhanced contrast for better readability</li>
+                            <li>Clear focus indicators</li>
+                            <li>Distinct status indicators</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Font Size Controls</h3>
+                        <ul class="feature-list">
+                            <li>Increase: <kbd>Ctrl/Cmd + +</kbd></li>
+                            <li>Decrease: <kbd>Ctrl/Cmd + -</kbd></li>
+                            <li>Reset: <kbd>Ctrl/Cmd + 0</kbd></li>
+                            <li>Three size options available</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="accessibility-section" id="reduced-motion">
+                <h2><i class="fas fa-running me-2"></i>Reduced Motion</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Features</h3>
+                        <ul class="feature-list">
+                            <li>Toggle with <kbd>Ctrl/Cmd + M</kbd></li>
+                            <li>Disables animations</li>
+                            <li>Reduces motion effects</li>
+                            <li>Improves focus stability</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Benefits</h3>
+                        <ul class="feature-list">
+                            <li>Reduces motion sickness</li>
+                            <li>Improves focus for users with attention disorders</li>
+                            <li>Better performance on low-end devices</li>
+                            <li>Reduced visual distractions</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="accessibility-section" id="best-practices">
+                <h2><i class="fas fa-check-circle me-2"></i>Best Practices</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>General Tips</h3>
+                        <ul class="feature-list">
+                            <li>Use keyboard navigation when possible</li>
+                            <li>Enable high contrast mode in bright environments</li>
+                            <li>Adjust font size for comfortable reading</li>
+                            <li>Enable reduced motion if animations are distracting</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Getting Help</h3>
+                        <ul class="feature-list">
+                            <li>Contact support for accessibility issues</li>
+                            <li><a href="/accessibility/feedback" class="text-decoration-none">Submit accessibility feedback</a></li>
+                            <li>Report bugs through the feedback form</li>
+                            <li>Check for updates regularly</li>
+                            <li>Join the accessibility testing program</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <a href="/security/dashboard" class="back-to-dashboard" aria-label="Back to dashboard">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <script>
+        // Add keyboard navigation for sections
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key >= '1' && e.key <= '5') {
+                const sections = document.querySelectorAll('.accessibility-section');
+                const index = parseInt(e.key) - 1;
+                if (sections[index]) {
+                    sections[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

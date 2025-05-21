@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Feedback - QDT Security Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2a2a2a;
+            --text-color: #ffffff;
+            --accent-color: #007bff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            background: var(--primary-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+        }
+
+        .feedback-form {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .form-control, .form-select {
+            background: var(--primary-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--text-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--primary-bg);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+        }
+
+        .form-text {
+            color: #adb5bd;
+        }
+
+        .back-to-dashboard {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 50%;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .back-to-dashboard:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .alert {
+            margin-top: 1rem;
+        }
+
+        /* High contrast mode */
+        .high-contrast {
+            --primary-bg: #000000;
+            --secondary-bg: #ffffff;
+            --text-color: #ffffff;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .feedback-form {
+                break-inside: avoid;
+                border: 1px solid #ddd;
+            }
+            .back-to-dashboard {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <header class="mb-5">
+            <h1 class="display-4 mb-4">Accessibility Feedback</h1>
+            <p class="lead">Help us improve the accessibility of the QDT Security Dashboard by sharing your feedback.</p>
+        </header>
+
+        <main>
+            <form id="accessibilityFeedbackForm" class="feedback-form" action="/accessibility/feedback" method="POST">
+                <div class="mb-4">
+                    <label for="feedbackType" class="form-label">Type of Feedback</label>
+                    <select class="form-select" id="feedbackType" name="feedback_type" required aria-required="true">
+                        <option value="">Select feedback type</option>
+                        <option value="bug">Accessibility Bug</option>
+                        <option value="suggestion">Improvement Suggestion</option>
+                        <option value="question">Question</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="feedbackArea" class="form-label">Area of Concern</label>
+                    <select class="form-select" id="feedbackArea" name="feedback_area" required aria-required="true">
+                        <option value="">Select area</option>
+                        <option value="keyboard">Keyboard Navigation</option>
+                        <option value="screen_reader">Screen Reader Support</option>
+                        <option value="visual">Visual Accessibility</option>
+                        <option value="motion">Motion and Animation</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="feedbackDescription" class="form-label">Description</label>
+                    <textarea class="form-control" id="feedbackDescription" name="feedback_description" rows="5" required aria-required="true" 
+                              placeholder="Please describe your feedback in detail. Include any specific steps to reproduce if reporting a bug."></textarea>
+                    <div class="form-text">Be as specific as possible to help us understand and address your feedback.</div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="impactLevel" class="form-label">Impact Level</label>
+                    <select class="form-select" id="impactLevel" name="impact_level" required aria-required="true">
+                        <option value="">Select impact level</option>
+                        <option value="high">High - Prevents me from using the dashboard</option>
+                        <option value="medium">Medium - Makes it difficult to use the dashboard</option>
+                        <option value="low">Low - Minor inconvenience</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="assistiveTechnology" class="form-label">Assistive Technology Used (Optional)</label>
+                    <input type="text" class="form-control" id="assistiveTechnology" name="assistive_technology" 
+                           placeholder="e.g., NVDA, VoiceOver, JAWS, etc.">
+                </div>
+
+                <div class="mb-4">
+                    <label for="contactEmail" class="form-label">Contact Email (Optional)</label>
+                    <input type="email" class="form-control" id="contactEmail" name="contact_email" 
+                           placeholder="We'll only use this to follow up on your feedback">
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Feedback
+                    </button>
+                </div>
+
+                <div id="formAlert" class="alert mt-3" role="alert" hidden></div>
+            </form>
+        </main>
+
+        <a href="/accessibility" class="back-to-dashboard" aria-label="Back to accessibility guide">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <script>
+        document.getElementById('accessibilityFeedbackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const alertDiv = document.getElementById('formAlert');
+            
+            try {
+                const formData = new FormData(form);
+                const response = await fetch('/accessibility/feedback', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alertDiv.className = 'alert alert-success mt-3';
+                    alertDiv.textContent = 'Thank you for your feedback! We will review it and get back to you if needed.';
+                    form.reset();
+                } else {
+                    throw new Error('Failed to submit feedback');
+                }
+            } catch (error) {
+                alertDiv.className = 'alert alert-danger mt-3';
+                alertDiv.textContent = 'Sorry, there was an error submitting your feedback. Please try again later.';
+            }
+            
+            alertDiv.hidden = false;
+            alertDiv.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const alertDiv = document.getElementById('formAlert');
+                if (!alertDiv.hidden) {
+                    alertDiv.hidden = true;
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

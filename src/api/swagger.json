@@ -1,0 +1,305 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Quantum Duality Theory API",
+    "description": "API for quantum duality theory calculations and crystal enhancement",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Health check endpoint",
+        "responses": {
+          "200": {
+            "description": "API health status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "timestamp": { "type": "number" },
+                    "version": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/config": {
+      "get": {
+        "summary": "Get calculator configuration",
+        "responses": {
+          "200": {
+            "description": "Current calculator configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "evolution_steps": { "type": "integer" },
+                    "convergence_threshold": { "type": "number" },
+                    "stability_window": { "type": "integer" },
+                    "resonance_depth": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/calculate": {
+      "post": {
+        "summary": "Calculate QDT value with crystal enhancement",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["value", "calculation_type"],
+                "properties": {
+                  "value": { "type": "number" },
+                  "calculation_type": { "type": "string" },
+                  "evolution_steps": {
+                    "type": "integer",
+                    "minimum": 10,
+                    "maximum": 1000,
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Calculation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": { "type": "number" },
+                    "convergence_metrics": {
+                      "type": "object",
+                      "properties": {
+                        "phase_coherence": { "type": "number" },
+                        "stability_score": { "type": "number" }
+                      }
+                    },
+                    "time_series": {
+                      "type": "array",
+                      "items": { "type": "number" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/analyze": {
+      "post": {
+        "summary": "Analyze convergence path",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["time_series"],
+                "properties": {
+                  "time_series": {
+                    "type": "array",
+                    "items": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Analysis result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "convergence_stability": { "type": "number" },
+                    "crystal_resonance_coupling": { "type": "number" },
+                    "void_filament_coupling": { "type": "number" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/batch": {
+      "post": {
+        "summary": "Perform batch calculations",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["calculations"],
+                "properties": {
+                  "calculations": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                      "type": "object",
+                      "required": ["value", "calculation_type"],
+                      "properties": {
+                        "value": { "type": "number" },
+                        "calculation_type": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch calculation results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "result": { "type": "number" },
+                              "convergence_metrics": {
+                                "type": "object",
+                                "properties": {
+                                  "phase_coherence": { "type": "number" },
+                                  "stability_score": { "type": "number" }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "error": { "type": "string" }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/ask": {
+      "post": {
+        "summary": "Ask QDT-related questions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["question"],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "minLength": 3
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Question response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "answer": { "type": "string" },
+                    "confidence": { "type": "number" },
+                    "crystal_metrics": {
+                      "type": "object",
+                      "properties": {
+                        "phase_coherence": { "type": "number" },
+                        "stability": { "type": "number" },
+                        "resonance": { "type": "number" }
+                      }
+                    },
+                    "processing_time": { "type": "number" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  }
+} 

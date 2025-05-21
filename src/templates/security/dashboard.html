@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QDT Security Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2a2a2a;
+            --text-color: #ffffff;
+            --accent-color: #007bff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --focus-ring: 3px solid var(--accent-color);
+        }
+
+        /* Base styles */
+        body {
+            background: var(--primary-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Focus styles */
+        *:focus {
+            outline: var(--focus-ring);
+            outline-offset: 2px;
+        }
+
+        /* Skip to main content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent-color);
+            color: white;
+            padding: 8px;
+            z-index: 100;
+            transition: top 0.2s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Cards and containers */
+        .metric-card {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .metric-card h3 {
+            color: var(--text-color);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Alert cards */
+        .alert-card {
+            background: var(--secondary-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .alert-card:hover {
+            transform: translateX(4px);
+        }
+
+        .alert-info { border-left-color: var(--accent-color); }
+        .alert-warning { border-left-color: var(--warning-color); }
+        .alert-critical { border-left-color: var(--danger-color); }
+
+        /* Status indicators */
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-good { background-color: var(--success-color); }
+        .status-warning { background-color: var(--warning-color); }
+        .status-critical { background-color: var(--danger-color); }
+
+        /* Buttons */
+        .refresh-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-button:hover {
+            background: #0056b3;
+        }
+
+        .refresh-button:focus {
+            outline: var(--focus-ring);
+            outline-offset: 2px;
+        }
+
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* Keyboard shortcut hints */
+        .keyboard-shortcut {
+            background: var(--secondary-bg);
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin-left: 8px;
+            font-size: 0.8em;
+            color: var(--accent-color);
+        }
+
+        /* Enhanced focus styles */
+        *:focus-visible {
+            outline: var(--focus-ring);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25);
+        }
+
+        /* Screen reader announcements */
+        .sr-announcement {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* High contrast mode */
+        .high-contrast {
+            --primary-bg: #000000;
+            --secondary-bg: #ffffff;
+            --text-color: #ffffff;
+            --focus-ring: 3px solid #ffffff;
+        }
+
+        .high-contrast .metric-card {
+            border: 2px solid var(--text-color);
+        }
+
+        .high-contrast .alert-card {
+            border: 2px solid var(--text-color);
+        }
+
+        /* Reduced motion */
+        .reduced-motion * {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        /* Keyboard shortcuts panel */
+        #keyboard-shortcuts {
+            background: var(--secondary-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--text-color);
+        }
+
+        #keyboard-shortcuts kbd {
+            background: var(--primary-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        /* Enhanced status indicators */
+        .status-indicator {
+            position: relative;
+        }
+
+        .status-indicator::after {
+            content: attr(data-status);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 8px;
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .status-indicator:hover::after {
+            opacity: 1;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .metric-card {
+                break-inside: avoid;
+                border: 1px solid #ddd;
+            }
+            .refresh-button {
+                display: none;
+            }
+            .keyboard-shortcut,
+            #keyboard-shortcuts,
+            .refresh-button {
+                display: none !important;
+            }
+        }
+
+        /* Font size controls */
+        .font-size-controls {
+            display: flex;
+            align-items: center;
+            background: var(--secondary-bg);
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .font-size-controls button {
+            padding: 4px 8px;
+            min-width: 32px;
+        }
+
+        /* Font size classes */
+        .font-size-small {
+            font-size: 0.875rem;
+        }
+
+        .font-size-large {
+            font-size: 1.125rem;
+        }
+
+        .font-size-xlarge {
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to main content link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="container-fluid py-4">
+        <header class="mb-4" role="banner">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2 mb-0">QDT Security Dashboard</h1>
+                <div class="d-flex align-items-center">
+                    <div class="font-size-controls me-3">
+                        <button 
+                            class="btn btn-outline-light btn-sm"
+                            onclick="decreaseFontSize()"
+                            aria-label="Decrease font size">
+                            <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button 
+                            class="btn btn-outline-light btn-sm mx-2"
+                            onclick="resetFontSize()"
+                            aria-label="Reset font size">
+                            <i class="fas fa-undo" aria-hidden="true"></i>
+                        </button>
+                        <button 
+                            class="btn btn-outline-light btn-sm"
+                            onclick="increaseFontSize()"
+                            aria-label="Increase font size">
+                            <i class="fas fa-plus" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <button 
+                        class="refresh-button me-3" 
+                        onclick="updateDashboard()" 
+                        aria-label="Refresh dashboard data"
+                        aria-live="polite">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                        <span>Refresh</span>
+                        <span class="keyboard-shortcut">Ctrl/Cmd + R</span>
+                    </button>
+                    <button 
+                        class="btn btn-outline-light me-3"
+                        onclick="toggleKeyboardShortcuts()"
+                        aria-expanded="false"
+                        aria-controls="keyboard-shortcuts">
+                        <i class="fas fa-keyboard" aria-hidden="true"></i>
+                        <span>Keyboard Shortcuts</span>
+                    </button>
+                    <a 
+                        href="/accessibility"
+                        class="btn btn-outline-light"
+                        aria-label="View accessibility documentation">
+                        <i class="fas fa-universal-access" aria-hidden="true"></i>
+                        <span>Accessibility Guide</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Keyboard shortcuts panel -->
+        <div id="keyboard-shortcuts" class="alert alert-info mb-4" role="region" aria-label="Keyboard shortcuts" hidden>
+            <h3>Keyboard Shortcuts</h3>
+            <ul class="list-unstyled">
+                <li><kbd>Ctrl/Cmd + R</kbd> - Refresh dashboard</li>
+                <li><kbd>Ctrl/Cmd + H</kbd> - Toggle high contrast mode</li>
+                <li><kbd>Ctrl/Cmd + M</kbd> - Toggle reduced motion</li>
+                <li><kbd>Ctrl/Cmd + +</kbd> - Increase font size</li>
+                <li><kbd>Ctrl/Cmd + -</kbd> - Decrease font size</li>
+                <li><kbd>Ctrl/Cmd + 0</kbd> - Reset font size</li>
+                <li><kbd>Tab</kbd> - Navigate between sections</li>
+                <li><kbd>Shift + Tab</kbd> - Navigate backwards</li>
+                <li><kbd>Space</kbd> - Expand/collapse section</li>
+                <li><kbd>Esc</kbd> - Close modal or panel</li>
+            </ul>
+        </div>
+        
+        <main id="main-content" role="main">
+            <div class="row">
+                <!-- System Metrics -->
+                <div class="col-md-6">
+                    <section class="metric-card" aria-labelledby="system-metrics-title">
+                        <h3 id="system-metrics-title">
+                            <i class="fas fa-server" aria-hidden="true"></i>
+                            System Resources
+                        </h3>
+                        <div class="status-indicator status-good" aria-label="System status: Good"></div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="systemMetrics" aria-label="System metrics chart" role="img"></canvas>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- Security Events -->
+                <div class="col-md-6">
+                    <section class="metric-card" aria-labelledby="security-events-title">
+                        <h3 id="security-events-title">
+                            <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                            Security Events
+                        </h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="securityEvents" aria-label="Security events chart" role="img"></canvas>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <!-- Recent Alerts -->
+                <div class="col-12">
+                    <section class="metric-card" aria-labelledby="recent-alerts-title">
+                        <h3 id="recent-alerts-title">
+                            <i class="fas fa-bell" aria-hidden="true"></i>
+                            Recent Alerts
+                        </h3>
+                        <div id="alertsList" role="list" aria-label="Recent security alerts"></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <!-- Live region for updates -->
+        <div id="live-updates" aria-live="polite" class="sr-only"></div>
+    </div>
+
+    <script>
+        // Initialize charts with accessibility options
+        const systemMetricsCtx = document.getElementById('systemMetrics').getContext('2d');
+        const securityEventsCtx = document.getElementById('securityEvents').getContext('2d');
+        
+        const systemMetricsChart = new Chart(systemMetricsCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'CPU Usage',
+                    data: [],
+                    borderColor: '#00ff00',
+                    tension: 0.4
+                }, {
+                    label: 'Memory Usage',
+                    data: [],
+                    borderColor: '#ff0000',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#ffffff',
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            color: '#ffffff',
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#ffffff'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        const securityEventsChart = new Chart(securityEventsCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Events',
+                    data: [],
+                    backgroundColor: '#007bff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#ffffff',
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            color: '#ffffff'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#ffffff'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Update dashboard data with error handling and accessibility
+        async function updateDashboard() {
+            const liveRegion = document.getElementById('live-updates');
+            try {
+                const response = await fetch('/security/metrics');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // Update system metrics
+                const timestamps = data.system_metrics.map(m => new Date(m.timestamp).toLocaleTimeString());
+                const cpuData = data.system_metrics.map(m => m.metrics.cpu_percent);
+                const memoryData = data.system_metrics.map(m => m.metrics.memory_percent);
+                
+                systemMetricsChart.data.labels = timestamps;
+                systemMetricsChart.data.datasets[0].data = cpuData;
+                systemMetricsChart.data.datasets[1].data = memoryData;
+                systemMetricsChart.update();
+                
+                // Update security events
+                const eventTypes = Object.keys(data.security_events);
+                const eventCounts = Object.values(data.security_events);
+                
+                securityEventsChart.data.labels = eventTypes;
+                securityEventsChart.data.datasets[0].data = eventCounts;
+                securityEventsChart.update();
+                
+                // Update alerts with accessibility improvements
+                const alertsList = document.getElementById('alertsList');
+                alertsList.innerHTML = data.alerts.map(alert => `
+                    <div class="alert-card alert-${alert.level.toLowerCase()}" 
+                         role="listitem"
+                         aria-label="Alert: ${alert.level} - ${alert.message}">
+                        <div class="d-flex align-items-center">
+                            <span class="status-indicator status-${alert.level.toLowerCase()}" 
+                                  aria-hidden="true"></span>
+                            <div>
+                                <strong>${alert.level}</strong>: ${alert.message}
+                                <small class="d-block text-muted">${new Date(alert.timestamp).toLocaleString()}</small>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Announce update to screen readers
+                liveRegion.textContent = 'Dashboard data updated successfully';
+            } catch (error) {
+                console.error('Error updating dashboard:', error);
+                // Show error message to user
+                const alertsList = document.getElementById('alertsList');
+                alertsList.innerHTML = `
+                    <div class="alert-card alert-critical" role="alert">
+                        <strong>Error</strong>: Failed to update dashboard data. Please try again later.
+                    </div>
+                `;
+                // Announce error to screen readers
+                liveRegion.textContent = 'Error updating dashboard data';
+            }
+        }
+
+        // Update every 5 seconds
+        setInterval(updateDashboard, 5000);
+        updateDashboard();
+
+        // Enhanced keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            // Refresh with Ctrl/Cmd + R
+            if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                updateDashboard();
+                announceToScreenReader('Dashboard refreshed');
+            }
+            
+            // Toggle high contrast mode with Ctrl/Cmd + H
+            if (e.key === 'h' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                toggleHighContrast();
+            }
+            
+            // Toggle reduced motion with Ctrl/Cmd + M
+            if (e.key === 'm' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                toggleReducedMotion();
+            }
+            
+            // Navigate between sections with Tab
+            if (e.key === 'Tab') {
+                const sections = document.querySelectorAll('section');
+                const currentSection = document.activeElement.closest('section');
+                if (currentSection) {
+                    const currentIndex = Array.from(sections).indexOf(currentSection);
+                    if (e.shiftKey && currentIndex > 0) {
+                        sections[currentIndex - 1].focus();
+                        announceToScreenReader(`Navigated to ${sections[currentIndex - 1].getAttribute('aria-label')}`);
+                    } else if (!e.shiftKey && currentIndex < sections.length - 1) {
+                        sections[currentIndex + 1].focus();
+                        announceToScreenReader(`Navigated to ${sections[currentIndex + 1].getAttribute('aria-label')}`);
+                    }
+                }
+            }
+
+            // Toggle keyboard shortcuts panel with Escape
+            if (e.key === 'Escape') {
+                const shortcutsPanel = document.getElementById('keyboard-shortcuts');
+                if (shortcutsPanel && !shortcutsPanel.hidden) {
+                    shortcutsPanel.hidden = true;
+                    announceToScreenReader('Keyboard shortcuts panel closed');
+                }
+            }
+
+            // Font size controls
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '+') {
+                    e.preventDefault();
+                    increaseFontSize();
+                } else if (e.key === '-') {
+                    e.preventDefault();
+                    decreaseFontSize();
+                } else if (e.key === '0') {
+                    e.preventDefault();
+                    resetFontSize();
+                }
+            }
+        });
+
+        // Screen reader announcements
+        function announceToScreenReader(message, priority = 'polite') {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', priority);
+            announcement.className = 'sr-announcement';
+            announcement.textContent = message;
+            document.body.appendChild(announcement);
+            setTimeout(() => announcement.remove(), 1000);
+        }
+
+        // Toggle keyboard shortcuts panel
+        function toggleKeyboardShortcuts() {
+            const panel = document.getElementById('keyboard-shortcuts');
+            const button = document.querySelector('[aria-controls="keyboard-shortcuts"]');
+            const isHidden = panel.hidden;
+            
+            panel.hidden = !isHidden;
+            button.setAttribute('aria-expanded', !isHidden);
+            
+            announceToScreenReader(
+                isHidden ? 'Keyboard shortcuts panel opened' : 'Keyboard shortcuts panel closed'
+            );
+        }
+
+        // Toggle high contrast mode
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+            const isHighContrast = document.body.classList.contains('high-contrast');
+            announceToScreenReader(
+                isHighContrast ? 'High contrast mode enabled' : 'High contrast mode disabled'
+            );
+        }
+
+        // Toggle reduced motion
+        function toggleReducedMotion() {
+            document.body.classList.toggle('reduced-motion');
+            const isReducedMotion = document.body.classList.contains('reduced-motion');
+            announceToScreenReader(
+                isReducedMotion ? 'Reduced motion enabled' : 'Reduced motion disabled'
+            );
+        }
+
+        // Font size controls
+        function increaseFontSize() {
+            const body = document.body;
+            if (body.classList.contains('font-size-small')) {
+                body.classList.remove('font-size-small');
+                body.classList.add('font-size-large');
+            } else if (body.classList.contains('font-size-large')) {
+                body.classList.remove('font-size-large');
+                body.classList.add('font-size-xlarge');
+            } else if (!body.classList.contains('font-size-xlarge')) {
+                body.classList.add('font-size-large');
+            }
+            announceToScreenReader('Font size increased');
+        }
+
+        function decreaseFontSize() {
+            const body = document.body;
+            if (body.classList.contains('font-size-xlarge')) {
+                body.classList.remove('font-size-xlarge');
+                body.classList.add('font-size-large');
+            } else if (body.classList.contains('font-size-large')) {
+                body.classList.remove('font-size-large');
+                body.classList.add('font-size-small');
+            } else if (!body.classList.contains('font-size-small')) {
+                body.classList.add('font-size-small');
+            }
+            announceToScreenReader('Font size decreased');
+        }
+
+        function resetFontSize() {
+            const body = document.body;
+            body.classList.remove('font-size-small', 'font-size-large', 'font-size-xlarge');
+            announceToScreenReader('Font size reset to default');
+        }
+
+        // Add touch support for mobile devices
+        document.addEventListener('touchstart', function() {}, {passive: true});
+    </script>
+</body>
+</html> 
